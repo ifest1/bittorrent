@@ -1,0 +1,8 @@
+# created by virtualenv automatically
+Lib/
+Scripts/
+__pycache__/
+.env
+todo.txt
+torrent-example.torrent
+pyvenv.cfg
