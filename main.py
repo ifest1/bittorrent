@@ -15,6 +15,4 @@ def main():
     for tracker in tracker_list:
         if tracker_type(tracker) == 'udp':
             udp_tracker_request_peers(tracker, file)
-
-
 main()

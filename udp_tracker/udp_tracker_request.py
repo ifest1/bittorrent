@@ -17,58 +17,41 @@ def udp_socket_open(url, port):
     return client
 
 def udp_tracker_request_peers(url, file_path):
-    url = urlparse(url)
-    url, port = url.netloc.split(':')
-    port = int(port)
-
-    packet = udp_tracker_connect_input()
-
     try:
-        client = udp_socket_open(url, port)
-        
+        url = urlparse(url)
+        url, port = url.netloc.split(':')
+        port = int(port)
+
+        packet = udp_tracker_connect_input() 
+        client = udp_socket_open(url, port)        
         client.sendto(packet, (url, port))
+        
         response = client.recv(1024)
         
-        if response and len(response) == 16: 
-            connection_id = udp_tracker_connect_output(response)[2]
+        if len(response) != 16: return
 
-            transaction_id =  randrange(0, 255)
-            packet = udp_announce_input(file_path, connection_id, transaction_id)
-            client.sendto(packet, (url, port))
+        connection_id, transaction_id = udp_tracker_connect_output(response)[2], randrange(0, 255)
+        client.sendto(udp_announce_input(file_path, connection_id, transaction_id), (url, port))
+        packed_peers = client.recv(1024)[20:]
+        
+        if not packed_peers: return
+        
+        peers = [(socket.inet_ntoa(packed_peers[i:i+4]), 
+        unpack("!h", packed_peers[i+4:i+6])) for i in range(0, len(packed_peers), 6)]
 
-            response = client.recv(1024)
-
-            packed_peers = response[20:]
-            
-            peers = []
-
-            if packed_peers:
-
-                i = 0
-
-                while True:
-                    
-                    if i + 6 <= len(packed_peers):
-                        ip, port = unpack_peers_address(packed_peers[i:i+6])
-                        peers += (ip, port)                      
-                        i += 6
-                    
-                    else: break
-            
-            print(peers)
-
-            return peers
+        print(peers)
+        return peers
 
     except Exception as e:
         pass
 
 def udp_tracker_connect_input():
     action, transaction_id, connection_id = 0, randrange(0, 255), 0x41727101980
-    return pack('!qii', connection_id, action, transaction_id)
-
+    buf = pack('!qii', connection_id, action, transaction_id)
+    return buf
 def udp_tracker_connect_output(packet):    
-    return unpack('!iiq', packet)
-
+    buf = unpack('!iiq', packet)
+    return buf
 
 def udp_announce_input(file_path, connection_id, transaction_id):
     action = 1
@@ -83,22 +66,8 @@ def udp_announce_input(file_path, connection_id, transaction_id):
     num_want = -1
     port = int(get_port())
 
-    return pack('!qii20s20sqqqiiiih',
-                connection_id,
-                action,
-                transaction_id,
-                info_hash,
-                peer_id,
-                downloaded,
-                left,
-                uploaded,
-                event,
-                ip,
-                key,
-                num_want,
-                port)
+    buf = pack('!qii', connection_id, action, transaction_id)
+    buf += pack('!20s20sqqq', info_hash, peer_id, downloaded, left, uploaded)
+    buf += pack("!iiiih",event, ip, key, num_want, port)
 
-def unpack_peers_address(packet):
-    port = unpack("!h", packet[4:])
-    ip = socket.inet_ntoa(packet[:4])
-    return ip, port 
+    return buf
