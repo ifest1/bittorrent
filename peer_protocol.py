@@ -8,7 +8,11 @@ file_path = config["FILE"]
 
 # peer handshake
 def handshake(info_hash, peer_id): 
-    return chr(19) + "BitTorrent protocol" + 8 * chr(0) + info_hash + peer_id
+    req = b'\x13'
+    req += b'BitTorrent protocol'
+    req += info_hash
+    req += peer_id
+    return req
 
 # ==========================================================================================
 # downloading messages
@@ -24,13 +28,3 @@ def request(piece_index,byte_offset, block_length=2**14):
 # ==========================================================================================
 
 # seeding messages
-
-
-
-
-
-# tests
-
-print(request(0, 0))
-
-print(file_path, get_info_hash(file_path), get_peer_id())

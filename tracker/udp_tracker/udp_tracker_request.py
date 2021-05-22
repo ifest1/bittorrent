@@ -1,5 +1,4 @@
 import socket
-from binascii import a2b_hex
 from urllib.parse import urlparse
 from urllib.parse import unquote
 from random import randrange
@@ -27,18 +26,23 @@ def udp_tracker_request_peers(url, file_path, peer_id, info_hash, port):
         
         if not packed_peers: return
         
-        peers = [(socket.inet_ntoa(packed_peers[i:i+4]), 
-        unpack("!H", packed_peers[i+4:i+6])) for i in range(0, len(packed_peers), 6)]
-        
-        print(peers)
-        
+        peers = []
+
+        for i in range(0, len(packed_peers), 6):
+            packed_ip = packed_peers[i:i+4]
+            packed_port = packed_peers[i+4:i+6]
+
+            ip = socket.inet_ntoa(packed_ip)
+            port = unpack("!H", packed_port)
+            
+            peers.append((ip, port[0]))
+ 
         return peers
 
     except Exception as e:
-        pass
+        return []
 
 def udp_announce_input(file_path, connection_id, transaction_id, peer_id, info_hash, port):
-    info_hash = a2b_hex(info_hash)
     buf = pack('!Qii', connection_id, 1, transaction_id)
     buf += pack('!20s20sQQQ', info_hash, peer_id, 0, 0, 0)
     buf += pack("!iiiiH", 2, 0, 0, -1, port)
