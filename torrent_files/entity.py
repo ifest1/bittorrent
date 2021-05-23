@@ -55,13 +55,15 @@ class TorrentInfo:
         torrent_info["pieces"] = data[b"info"][b"pieces"]
         torrent_info["name"] = data[b"info"][b"name"].decode()
         torrent_info["piece_length"] = data[b"info"][b"piece length"]
-        torrent_info["announce_list"] = [tracker[0].decode() for tracker in data[b"announce-list"]]
+        torrent_info["announce_list"] = [
+            tracker[0].decode() for tracker in data[b"announce-list"]
+            ]
         torrent_info["files"] = [
-                                {key.decode() if isinstance(key, bytes) else 
-                                key: [name.decode() for name in value] if 
-                                isinstance(value, list) else value 
-                                for key, value in f.items()}
-                                for f in data[b"info"][b"files"]
-                                ]
+            {key.decode() if isinstance(key, bytes) else 
+            key: [name.decode() for name in value] if 
+            isinstance(value, list) else value 
+            for key, value in f.items()}
+            for f in data[b"info"][b"files"]
+            ]
         
         return torrent_info

@@ -1,5 +1,5 @@
 from torrent_files.entity import TorrentInfo
-from files.entity import File
+from files.entity import Files
 from sessions.entity import Manager
 from peers.messages import *
 import socket
@@ -23,16 +23,17 @@ def main():
 
     pieces = torrent_info.get_pieces()
     name = torrent_info.get_name()
-    length = torrent_info.get_piece_length()
-
-    file_description = File(name, pieces, length)
+    piece_length = torrent_info.get_piece_length()
+    files = torrent_info.get_files()
+    file_description = Files(name, pieces, piece_length, files)
     
-    print(file_description)
+    #print(file_description)
+    #print(file_description.get_piece_hash(3))
 
-    print(file_description.get_piece_hash(3))
+    virtual_f_size = file_description.get_pieces_amount() * file_description.get_piece_length()
 
-    for i in file_description.hashes:
-        print(i)
+    print(file_description.get_pieces_amount())
+    print(virtual_f_size, file_description.get_piece_length())
 
     """
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
