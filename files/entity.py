@@ -43,8 +43,8 @@ class Files:
             file_length = _file["length"]
             file_path = _file["path"]
             
-            piece_bytes_fulfillment = file_length + self.pieces[piece_index].get_byte_offset()
-            pieces_amount, remaining_bytes = divmod(piece_bytes_fulfillment, self.piece_length)
+            piece_bytes_fillment = file_length + self.pieces[piece_index].get_byte_offset()
+            pieces_amount, remaining_bytes = divmod(piece_bytes_fillment, self.piece_length)
             
             for index in range(pieces_amount): 
                 piece = self.pieces[index]
@@ -54,12 +54,12 @@ class Files:
 
             if remaining_bytes: 
                 current_piece_offset = self.pieces[piece_index].get_byte_offset()
-                piece_bytes_fulfillment = current_piece_offset + remaining_bytes
+                piece_bytes_fillment = current_piece_offset + remaining_bytes
                 next_piece_offset = remaining_bytes
 
-                if piece_bytes_fulfillment > self.piece_length:
-                    next_piece_offset = piece_bytes_fulfillment % self.piece_length
-                    piece_bytes_fulfillment -= next_piece_offset
+                if piece_bytes_fillment > self.piece_length:
+                    next_piece_offset = piece_bytes_fillment % self.piece_length
+                    piece_bytes_fillment -= next_piece_offset
                     piece = self.pieces[piece_index]
                     piece.set_byte_offset(next_piece_offset)
                     piece_index += 1
