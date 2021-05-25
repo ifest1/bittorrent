@@ -14,11 +14,11 @@ class TorrentInfo:
     def __eq__(self, other):
         return self.info_hash == other.get_info_hash()
 
-    def __repr__(self):
-        return self.info_hash
-
     def __str__(self):
         return self.info_hash
+
+    def __repr__(self):
+        return self.__str__()
 
     def get_name(self):
         return self.data["name"]

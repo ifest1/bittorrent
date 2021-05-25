@@ -1,5 +1,5 @@
 from torrent_files.entity import TorrentInfo
-from files.entity import Files
+from files.entity import FilesPieces
 from sessions.entity import Manager
 from peers.messages import *
 import socket
@@ -23,7 +23,7 @@ def main():
         file_size += f["length"]
 
 
-    files_manager = Files(name, pieces, piece_length, file_size, files)
+    files_manager = FilesPieces(name, pieces, piece_length, file_size, files)
 
 
 
