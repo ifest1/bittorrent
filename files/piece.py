@@ -54,7 +54,7 @@ class Piece:
             disk_offset = chunks_info[1]
             self.download_blocks()
 
-    # downloads blocks in paralell
+    # downloads blocks in parallel (To Do)
     def download_blocks(self):
         piece_offset = 0
         blocks = self.size // self.block_size
