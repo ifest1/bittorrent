@@ -28,16 +28,6 @@ class FilesPieces:
                         Piece(
                         pieces_hashes[i:i+20], 
                         self.piece_length))
-    
-    def map_piece_to_file_on_disk(self, 
-                                piece, 
-                                file_path, 
-                                bytes_range, 
-                                file_disk_offset):
-        piece.add_file_disk_paths(
-                            file_path, 
-                            (bytes_range, 
-                            file_disk_offset))
 
     def set_files_pieces_disk_path(self, files):
         current_piece, current_file = 0, 0
@@ -67,12 +57,11 @@ class FilesPieces:
                 for file_disk_offset in range(len(file_pieces)):
                     piece = file_pieces[file_disk_offset]
                     path = '/'.join(file_path)
-                    self.map_piece_to_file_on_disk(
-                                            piece,
-                                            path, 
-                                            (piece.allocated(), 
-                                            self.piece_length), 
-                                            file_disk_offset)
+                    piece.add_file_disk_paths(
+                                        path, 
+                                        (piece.allocated(), 
+                                        self.piece_length), 
+                                        file_disk_offset)
 
                 piece.alloc(self.piece_length)
                 current_piece += amount
@@ -84,14 +73,11 @@ class FilesPieces:
                 file_piece = [piece]
                 piece.alloc(file_length + offset_to_write)
                 path = '/'.join(file_path)
-                self.map_piece_to_file_on_disk(
-                                            piece,
-                                            path, 
-                                            (
-                                            offset_to_write,
-                                            file_length 
-                                            + offset_to_write
-                                            ), 
-                                            0)
+                piece.add_file_disk_paths(
+                                    path, 
+                                    (offset_to_write,
+                                    file_length 
+                                    + offset_to_write), 
+                                    0)
             current_file += 1
         
