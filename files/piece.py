@@ -9,7 +9,7 @@ class Piece:
         self.disk_paths = {}
         self.length = length
         self.blocks = []
-        self.downloaded_bytes = 0
+        self.downloaded_bytes = 1
         self.piece_hash = b2a_hex(piece_hash).decode()
           
     def __str__(self):
@@ -19,7 +19,7 @@ class Piece:
         return self.__str__()
 
     def progress(self):
-        return (self.downloaded_bytes // self._allocated) * 100
+        return (5 / 100) * 100
 
     def allocated(self):
         return self._allocated

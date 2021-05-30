@@ -71,6 +71,11 @@ class FilesPieces:
                 piece.alloc(self.piece_size)
                 piece = self.pieces[current_piece]
                 piece.alloc(remaining)
+                piece.add_file_disk_paths(
+                                    path,
+                                    ((0,
+                                    remaining),
+                                    0))
             
             else:       
                 offset_to_write = piece.allocated()
@@ -87,5 +92,9 @@ class FilesPieces:
 
     def download_pieces(self):
         for piece in self.pieces:
-            print(piece.disk_paths)
-        
+            piece_disk_info = piece.disk_paths
+            print(piece, piece_disk_info)
+            #for info in piece_disk_info.items():
+                #file_path = info[0]
+
+
