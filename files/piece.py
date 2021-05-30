@@ -4,11 +4,12 @@ class Piece:
     def __init__(self, 
                 piece_hash, 
                 length):
-
-        self.allocated = 0
+        
+        self._allocated = 0
         self.disk_paths = {}
         self.length = length
         self.blocks = []
+        self.downloaded_bytes = 0
         self.piece_hash = b2a_hex(piece_hash).decode()
           
     def __str__(self):
@@ -18,16 +19,15 @@ class Piece:
         return self.__str__()
 
     def progress(self):
-        return (self.allocated // self.length) * 100
+        return (self.downloaded_bytes // self._allocated) * 100
 
     def allocated(self):
-        return self.allocated
+        return self._allocated
 
     def alloc(self, allocated):
-        self.allocated = allocated
+        self._allocated = allocated
     
     def add_file_disk_paths(self, file_disk_path, offsets):
-
         if file_disk_path not in self.disk_paths.items():
             self.disk_paths[file_disk_path] = [offsets]
             return

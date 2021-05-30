@@ -1,11 +1,13 @@
 from torrent_files.entity import TorrentInfo
-from files.entity import FilesPieces
 from sessions.entity import Manager
+from files.pieces import FilesPieces
 from peers.messages import *
 import socket
 
 def main():
-    torrent_info = TorrentInfo("16BF0508DEE533A5430C4AF7E5ED24889614D414.torrent")
+    torrent_info = TorrentInfo(
+            "16BF0508DEE533A5430C4AF7E5ED24889614D414.torrent")
+    download_folder = "/home/iestrela/Downloads"
     session = Manager(
         ports = {
             "udp_port": 6882,
@@ -23,10 +25,15 @@ def main():
         file_size += f["length"]
 
 
-    files_manager = FilesPieces(name, pieces, piece_length, file_size, files)
+    files_pieces = FilesPieces(
+                            name, 
+                            pieces, 
+                            piece_length, 
+                            file_size, 
+                            files,
+                            download_folder)
 
-    
-
+    files_pieces.download_pieces()
 
 
 

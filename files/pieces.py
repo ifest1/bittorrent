@@ -1,23 +1,27 @@
 from files.piece import Piece
+from disk.manager import DiskManager
 
 class FilesPieces:
     def __init__(self, 
                 name, 
                 pieces_hashes, 
-                piece_length, 
-                file_size, 
-                files):
+                piece_size, 
+                total_size, 
+                files,
+                download_folder
+                ):
 
-        self.name = name
         self.pieces = []
-        self.file_size = file_size
-        self.piece_length = piece_length
+        self.main_folder_name = name
+        self.total_size = total_size
+        self.piece_size = piece_size
         self.set_pieces_array(pieces_hashes)
         self.pieces_amount = len(self.pieces)
         self.set_files_pieces_disk_path(files)
+        self.disk_manager = DiskManager(download_folder)
 
     def __str__(self):
-        return self.name
+        return self.main_folder_name
 
     def __repr__(self):
         return self.__str__()
@@ -27,7 +31,7 @@ class FilesPieces:
             self.pieces.append(
                         Piece(
                         pieces_hashes[i:i+20], 
-                        self.piece_length))
+                        self.piece_size))
 
     def set_files_pieces_disk_path(self, files):
         current_piece, current_file = 0, 0
@@ -40,13 +44,13 @@ class FilesPieces:
                 break
         
             file_path = files[current_file]["path"]
-            file_length = files[current_file]["length"]
+            file_size = files[current_file]["length"]
             piece = self.pieces[current_piece]
         
             amount, remaining = divmod(
-                                    file_length 
+                                    file_size 
                                     + piece.allocated(), 
-                                    self.piece_length)
+                                    self.piece_size)
 
             if amount:
                 offset_to_write = piece.allocated()
@@ -54,30 +58,34 @@ class FilesPieces:
                                     current_piece:current_piece 
                                     + amount]
 
-                for file_disk_offset in range(len(file_pieces)):
-                    piece = file_pieces[file_disk_offset]
+                for pieces in range(len(file_pieces)):
+                    piece = file_pieces[pieces]
                     path = '/'.join(file_path)
                     piece.add_file_disk_paths(
                                         path, 
-                                        (piece.allocated(), 
-                                        self.piece_length), 
-                                        file_disk_offset)
+                                        ((piece.allocated(), 
+                                        self.piece_size), 
+                                        pieces))
 
-                piece.alloc(self.piece_length)
                 current_piece += amount
+                piece.alloc(self.piece_size)
                 piece = self.pieces[current_piece]
                 piece.alloc(remaining)
             
             else:       
                 offset_to_write = piece.allocated()
-                file_piece = [piece]
-                piece.alloc(file_length + offset_to_write)
+                piece.alloc(file_size + offset_to_write)
                 path = '/'.join(file_path)
                 piece.add_file_disk_paths(
                                     path, 
-                                    (offset_to_write,
-                                    file_length 
+                                    ((offset_to_write,
+                                    file_size 
                                     + offset_to_write), 
-                                    0)
+                                    0))
             current_file += 1
+
+
+    def download_pieces(self):
+        for piece in self.pieces:
+            print(piece.disk_paths)
         

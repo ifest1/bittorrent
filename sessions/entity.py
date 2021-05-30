@@ -10,11 +10,11 @@ class Manager:
         self.peer_id = b2a_hex(urandom(20))
         self.tracker_handler = TrackerHandler(kwargs["ports"])
 
-    def __repr__(self):
-        return self.peer_id.decode()
-
     def __str__(self):
         return self.peer_id.decode()
+
+    def __repr__(self):
+        return self.__str__()
      
     def get_peers_map(self):
         return self.peers_map
@@ -29,5 +29,13 @@ class Manager:
         announce_list = torrent_info.get_announce_list()
         info_hash = torrent_info.get_encoded_info_hash()
         peer_id = self.get_encoded_peer_id()
-        peers = self.tracker_handler.get_peers(info_hash, peer_id, announce_list)
-        self.peers_map[torrent_info] = [Peer(peer[0], peer[1]) for peer in peers]
+
+        peers = self.tracker_handler.get_peers(
+                                        info_hash, 
+                                        peer_id, 
+                                        announce_list)
+
+        self.peers_map[torrent_info] = [
+                                Peer(peer[0], peer[1]) 
+                                for peer in peers
+                                ]
