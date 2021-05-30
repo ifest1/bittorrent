@@ -1,24 +1,39 @@
 from struct import pack
 
-def handshake(info_hash, peer_id): 
-    req = b'\x13'
-    req += b'BitTorrent protocol'
-    req += b'\00' * 8
-    req += info_hash
-    req += peer_id
-    return req
+class Packet:
+    def __init__(self):
+        self.packet_types = [
+            "CHOKE",
+            "UNCHOKE",
+            "INTERESTED",
+            "NOT_INTERESTED",
+            "HAVE",
+            "BITFIELD",
+            "REQUEST",
+            "PIECE",
+            "CANCEL",
+            "PORT",
+        ]
 
-def keep_alive(): return pack("!i", 0)
+    def handshake(self, info_hash, peer_id): 
+        pack = b'\x13'
+        pack += b'BitTorrent protocol'
+        pack += b'\00' * 8
+        pack += info_hash
+        pack += peer_id
+        return pack
 
-def choke(): return pack("!ib", 1, 0)
+    def have(self, piece_index): 
+        return pack("!ibi", 5, 4, piece_index)
 
-def unchoke():  return pack("!ib", 1, 1)
+    def request(self, piece_index, byte_offset, block_length):
+        pack = pack("!ib", 13, 6)
+        pack += pack("!iii", piece_index, byte_offset, block_length)
+        return pack
 
-def interested(): return pack("!ib", 1, 2)
+    def unpack_incoming_packet(self, packet):
+        if len(packet) == 4: return 'KEEP_ALIVE'
+        return self.packet_types[packet[5]]
+            
 
-def not_interested(): return pack("!ib", 1, 3)
-
-def have(piece_index): return pack("!ibi", 5, 4, piece_index)
-
-def request(piece_index, byte_offset, block_length=2**14): 
-    return pack("!ibiii", 13, 6, piece_index, byte_offset, block_length) 
+    

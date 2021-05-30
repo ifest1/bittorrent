@@ -5,12 +5,12 @@ class Piece:
                 piece_hash, 
                 length):
 
-        self.byte_offset = 0
+        self.allocated = 0
         self.disk_paths = {}
         self.length = length
+        self.blocks = []
         self.piece_hash = b2a_hex(piece_hash).decode()
-        
-    
+          
     def __str__(self):
         return f"{self.piece_hash} ===> {str(self.progress())}%"
 
@@ -18,13 +18,13 @@ class Piece:
         return self.__str__()
 
     def progress(self):
-        return (self.byte_offset // self.length) * 100
+        return (self.allocated // self.length) * 100
 
-    def get_byte_offset(self):
-        return self.byte_offset
+    def allocated(self):
+        return self.allocated
 
-    def set_byte_offset(self, byte_offset):
-        self.byte_offset = byte_offset
+    def alloc(self, allocated):
+        self.allocated = allocated
     
     def add_file_disk_paths(self, file_disk_path, offsets):
 
@@ -33,3 +33,14 @@ class Piece:
             return
         
         self.disk_paths[file_disk_path] += [offsets]
+
+    def store_piece_on_disk(self):
+        pass
+
+    def request_block(self):
+        pass
+
+    def piece_blocks(self):
+        pass
+
+    

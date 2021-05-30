@@ -1,7 +1,13 @@
 from files.piece import Piece
 
 class FilesPieces:
-    def __init__(self, name, pieces_hashes, piece_length, file_size, files):
+    def __init__(self, 
+                name, 
+                pieces_hashes, 
+                piece_length, 
+                file_size, 
+                files):
+
         self.name = name
         self.pieces = []
         self.file_size = file_size
@@ -19,53 +25,73 @@ class FilesPieces:
     def set_pieces_array(self, pieces_hashes):
         for i in range(0, len(pieces_hashes), 20):
             self.pieces.append(
-                Piece(
-                pieces_hashes[i:i+20], 
-                self.piece_length,
-                ))
+                        Piece(
+                        pieces_hashes[i:i+20], 
+                        self.piece_length))
     
-    def map_piece_to_file_on_disk(self, piece, file_path, bytes_range, file_disk_offset):
-        piece.add_file_disk_paths(file_path, (bytes_range, file_disk_offset))
-        return
-
+    def map_piece_to_file_on_disk(self, 
+                                piece, 
+                                file_path, 
+                                bytes_range, 
+                                file_disk_offset):
+        piece.add_file_disk_paths(
+                            file_path, 
+                            (bytes_range, 
+                            file_disk_offset))
 
     def set_files_pieces_disk_path(self, files):
         current_piece, current_file = 0, 0
+        
         while True:
-            if current_piece > self.pieces_amount - 1: break
+            if current_piece > self.pieces_amount - 1: 
+                break
 
-            if current_file >= len(files): break
+            if current_file >= len(files): 
+                break
         
             file_path = files[current_file]["path"]
             file_length = files[current_file]["length"]
             piece = self.pieces[current_piece]
         
-            pieces_amount, remaining_bytes = divmod(file_length + piece.get_byte_offset(), self.piece_length)
+            amount, remaining = divmod(
+                                    file_length 
+                                    + piece.allocated(), 
+                                    self.piece_length)
 
-            if pieces_amount:
-                piece_offset = piece.get_byte_offset()
-                file_pieces = self.pieces[current_piece:current_piece + pieces_amount]
+            if amount:
+                offset_to_write = piece.allocated()
+                file_pieces = self.pieces[
+                                    current_piece:current_piece 
+                                    + amount]
 
                 for file_disk_offset in range(len(file_pieces)):
                     piece = file_pieces[file_disk_offset]
                     path = '/'.join(file_path)
-                    self.map_piece_to_file_on_disk(piece, path, (piece.get_byte_offset(), self.piece_length), file_disk_offset)
+                    self.map_piece_to_file_on_disk(
+                                            piece,
+                                            path, 
+                                            (piece.allocated(), 
+                                            self.piece_length), 
+                                            file_disk_offset)
 
-                piece.set_byte_offset(self.piece_length)
-                current_piece += pieces_amount
+                piece.alloc(self.piece_length)
+                current_piece += amount
                 piece = self.pieces[current_piece]
-                piece.set_byte_offset(remaining_bytes)
+                piece.alloc(remaining)
             
             else:       
-                piece_offset = piece.get_byte_offset()
+                offset_to_write = piece.allocated()
                 file_piece = [piece]
-                piece.set_byte_offset(file_length + piece_offset)
+                piece.alloc(file_length + offset_to_write)
                 path = '/'.join(file_path)
-                self.map_piece_to_file_on_disk(piece, path, (piece_offset, file_length + piece_offset), 0)
-
+                self.map_piece_to_file_on_disk(
+                                            piece,
+                                            path, 
+                                            (
+                                            offset_to_write,
+                                            file_length 
+                                            + offset_to_write
+                                            ), 
+                                            0)
             current_file += 1
-
-        for piece in self.pieces:
-            for key, value in piece.disk_paths.items():
-                print(key, value)
         
