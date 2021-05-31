@@ -26,28 +26,28 @@ class Peer:
             piece_index, 
             piece_offset, 
             block_size
-        ))
+            ))
         
-        block = Packets.unpack_incoming_packet(
+        response = Packets.unpack_incoming_packet(
             self.recv_buffer
-        )
+            )
 
-        return block
+        return response
 
     def connect(self, info_hash, peer_id):
         self.connection = socket.socket(
             socket.AF_INET, 
             socket.SOCK_STREAM
-        )
+            )
 
         self.connection.connect((
             self.ip, self.port
-        ))
+            ))
 
         self.connection.settimeout(5)
         self.send_packet(Packets.handshake(
             info_hash, peer_id
-        ))
+            ))
 
     def close_conn(self):
         self.connection.close()

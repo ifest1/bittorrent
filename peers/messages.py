@@ -18,44 +18,34 @@ class Packets:
     
     @staticmethod
     def unpack_incoming_packet(self, packet):
-        if len(packet) == 4: 
-            return 'KEEP_ALIVE'
+        if len(packet) == 4: return 'KEEP_ALIVE'
 
         packet_type = self.packet_types[packet[4]]
         
         if packet_type == "PIECE":
             length = unpack("!i", packet[0:3])
-            length -= 9
             index, begin = unpack("!ii", packet[5:13])
+            length -= 9
             
-            # now unpack block To Do
+            return (length, packet[13:])
+
+        # unpack remaining packet types (TO-DO)
 
     @staticmethod
     def have(self, piece_index): 
-        return pack("!ibi", 
-                    5, 
-                    4, 
-                    piece_index
-                    )
+        return pack("!ibi", 5, 4, piece_index)
 
     @staticmethod
-    def request(self, 
-                piece_index, 
-                byte_offset, 
-                block_size):
+    def request(self, piece_index, 
+                byte_offset, block_size):
 
         pack = pack("!ib", 13, 6)
-        pack += pack("!iii", 
-                    piece_index, 
-                    byte_offset, 
-                    block_size
-                    )
+        pack += pack("!iii", piece_index, 
+                    byte_offset, block_size)
         return pack
     
     @staticmethod
-    def handshake(self, 
-            info_hash, 
-            peer_id): 
+    def handshake(self, info_hash, peer_id): 
         pack = b'\x13'
         pack += b'BitTorrent protocol'
         pack += b'\00' * 8

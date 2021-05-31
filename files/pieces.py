@@ -1,5 +1,4 @@
 from files.piece import Piece
-from disk.manager import DiskManager
 
 class FilesPieces:
     def __init__(self, name, pieces_hashes, 
@@ -26,10 +25,10 @@ class FilesPieces:
         for index in range(0, len(pieces_hashes), 20):
             self.pieces.append(
                 Piece(
-                    pieces_hashes[index:index+20], 
-                    self.piece_size,
-                    index
-                ))
+                pieces_hashes[index:index+20], 
+                self.piece_size,
+                index
+            ))
     
     def set_files_pieces_disk_path(self, files):
         current_piece, current_file = 0, 0
@@ -49,7 +48,7 @@ class FilesPieces:
                 file_size 
                 + piece.allocated(), 
                 self.piece_size
-                )
+            )
 
             if amount:
                 offset_to_write = piece.allocated()
@@ -67,7 +66,7 @@ class FilesPieces:
                             self.piece_size
                             ), 
                             pieces
-                        ))
+                    ))
 
                 current_piece += amount
                 piece.alloc(self.piece_size)
@@ -78,7 +77,7 @@ class FilesPieces:
                         0,
                         remaining),
                         0
-                    ))
+                ))
             
             else:       
                 offset_to_write = piece.allocated()
@@ -91,7 +90,7 @@ class FilesPieces:
                         + offset_to_write
                         ), 
                         0
-                    ))
+                ))
 
             current_file += 1
 

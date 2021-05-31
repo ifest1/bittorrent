@@ -1,5 +1,5 @@
 from binascii import b2a_hex
-from disk.utils import write_bytes_at_offset
+from disk.utils import write_bytes_on_file_at
 
 class Piece:
     def __init__(self, 
@@ -41,41 +41,48 @@ class Piece:
         self.disk_paths[file_disk_path] += [offsets]
 
     def download(self, peer, folder, name):
-        piece_disk_info = self.disk_paths
+        piece_disk_info = self.disk_paths.items()
+        size = len(piece_disk_info)
+        piece_offset = piece_disk_info[0][1][0][0]
+        current_file = 0
+        next_file = True
 
-        for info in piece_disk_info.items():
-            file_path = info[0]
-            chunks_info = info[1]
-            piece_range = chunks_info[0]
-            disk_offset = chunks_info[1]
-            disk_offset = self.size * disk_offset
+        while True:
+            if current_file == size: 
+                break
+                
+            if next_file:
+                info = piece_disk_info[current_file]
+                file_path = info[0]
+                chunks_info = info[1]
+                piece_range = chunks_info[0]
+                disk_offset = chunks_info[1]
+                disk_offset = self.size * disk_offset
+                next_file = False
 
             path = "{}/{}/{}".format(
-                folder,
-                name,
-                file_path
+                folder, name, file_path
             )
-
-            self.download_blocks(
+            self.download_block(
                 peer, path, disk_offset
             )
-
-    def download_blocks(self, peer, path, disk_offset):
-        piece_offset = 0
-        
-        for i in range(self.blocks):
-            block = peer.request_block(
-                self.index,
-                piece_offset,
-                self.block_size
-            )
-
-            write_bytes_on_file_at(
-                path,
-                disk_offset,
-                block
-            )
-
             piece_offset += self.block_size
+
+            if piece_offset not in range(piece_range):
+                current_file += 1
+                next_file = True
+
+    def download_block(self, peer, path, disk_offset):
+        block = peer.request_block(
+            self.index,
+            piece_offset,
+            self.block_size
+        )
+
+        write_bytes_on_file_at(
+            path, disk_offset,
+            block
+        )
+
         
     

@@ -12,9 +12,11 @@ def main():
         ports = {
             "udp_port": 6882,
             "http_port": 80
-        })
+            })
 
-    for f in files:
+    file_size = 0
+    
+    for f in torrent_info.get_files():
         file_size += f["length"]
 
     files_pieces = FilesPieces(
@@ -24,8 +26,8 @@ def main():
         torrent_info.get_files(),
         file_size,
         download_folder
-    )
+        )
 
-    files_pieces.download_all()
+    #files_pieces.download_all()
 
 main()

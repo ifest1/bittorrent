@@ -14,7 +14,7 @@ def touch(file_path):
 
 def write_bytes_on_file_at(file_path, 
                         offset, data):
-    f = open(file_path), "r+b")
+    f = open(file_path, "r+b")
     f.seek(offset)
     f.write(data)
     f.close()
