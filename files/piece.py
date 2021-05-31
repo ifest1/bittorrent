@@ -50,7 +50,7 @@ class Piece:
         while True:
             if current_file == size: 
                 break
-                
+
             if next_file:
                 info = piece_disk_info[current_file]
                 file_path = info[0]
@@ -58,11 +58,11 @@ class Piece:
                 piece_range = chunks_info[0]
                 disk_offset = chunks_info[1]
                 disk_offset = self.size * disk_offset
+                path = "{}/{}/{}".format(
+                    folder, name, file_path
+                )
                 next_file = False
 
-            path = "{}/{}/{}".format(
-                folder, name, file_path
-            )
             self.download_block(
                 peer, path, disk_offset
             )
