@@ -18,3 +18,5 @@ def write_bytes_at(file_path, offset, bytes):
     f.write(bytes)
     f.close()
 
+def is_bit_set(x, n):
+    return x & 1 << n != 0

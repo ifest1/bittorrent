@@ -15,6 +15,7 @@ class UDPTrackerHandler:
         try:
             url = urlparse(tracker)
             url, tracker_port = url.netloc.split(':')
+            print("Fetching peers from {}".format(url))
             tracker_port = int(tracker_port)
             client = self.open_udp_socket()      
             client.sendto(self._connect_input(), (url, tracker_port))
